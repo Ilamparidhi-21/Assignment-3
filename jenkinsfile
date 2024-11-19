@@ -1,0 +1,27 @@
+pipeline {
+    agent none
+
+    stages {
+        stage('Trigger Test Job') {
+            when {
+                branch 'develop'  // Trigger only when code is pushed to 'develop' branch
+            }
+            steps {
+                script {
+                    build job: 'test', wait: true
+                }
+            }
+        }
+
+        stage('Trigger Prod Job') {
+            when {
+                expression { currentBuild.result == 'SUCCESS' } // Proceed only if the test job succeeds
+            }
+            steps {
+                script {
+                    build job: 'prod', wait: true
+                }
+            }
+        }
+    }
+}
